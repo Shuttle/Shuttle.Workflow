@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="Shuttle.Workflow.Application/Shuttle.Workflow.Application.csproj" />
+  <Project Path="Shuttle.Workflow.SqlServer/Shuttle.Workflow.SqlServer.csproj" />
+  <Project Path="Shuttle.Workflow.Builder/Shuttle.Workflow.Builder.csproj" />
+  <Project Path="Shuttle.Workflow.EventProcessing/Shuttle.Workflow.EventProcessing.csproj" />
+  <Project Path="Shuttle.Workflow.Extensions/Shuttle.Workflow.Extensions.csproj" Id="466c2738-d3a3-4094-a4bb-b67f436302b2" />
+  <Project Path="Shuttle.Workflow.Messages/Shuttle.Workflow.Messages.csproj" />
+  <Project Path="Shuttle.Workflow.RestClient/Shuttle.Workflow.RestClient.csproj" />
+  <Project Path="Shuttle.Workflow.Server/Shuttle.Workflow.Server.csproj" />
+  <Project Path="Shuttle.Workflow.Tests/Shuttle.Workflow.Tests.csproj" />
+  <Project Path="Shuttle.Workflow.WebApi.Contracts/Shuttle.Workflow.WebApi.Contracts.csproj" />
+  <Project Path="Shuttle.Workflow.WebApi/Shuttle.Workflow.WebApi.csproj" />
+  <Project Path="Shuttle.Workflow/Shuttle.Workflow.csproj" />
+</Solution>

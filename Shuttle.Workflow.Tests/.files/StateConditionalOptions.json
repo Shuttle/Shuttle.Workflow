@@ -1,0 +1,48 @@
+{
+  "StateConditionals": [
+    {
+      "Value": "groupa@domain.com",
+      "Specifications": [
+        {
+          "Type": "Equals",
+          "Source": "BusinessUnit",
+          "Value": "Operations"
+        }
+      ]
+    },
+    {
+      "Value": "groupb@domain.com",
+      "Specifications": [
+        {
+          "Type": "Regex",
+          "Source": "Country",
+          "Value": "\\b(?:RSA|SA|South Africa)\\b"
+        },
+        {
+          "Type": "Contains",
+          "Source": "BusinessUnit",
+          "Value": "Support"
+        }
+      ]
+    },
+    {
+      "Value": "groupc@domain.com",
+      "Specifications": [
+        {
+          "Source": "Country",
+          "Value": "Australia|Aus"
+        }
+      ]
+    },
+    {
+      "Value": "groupc@domain.com",
+      "Specifications": [
+        {
+          "Type": "Equals",
+          "Source": "City",
+          "Value": "Sydney"
+        }
+      ]
+    }
+  ]
+}

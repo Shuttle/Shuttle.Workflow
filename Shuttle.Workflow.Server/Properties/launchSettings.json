@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Shuttle.Workflow.Server": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "CONFIGURATION_FOLDER": "."
+      }
+    }
+  }
+}
