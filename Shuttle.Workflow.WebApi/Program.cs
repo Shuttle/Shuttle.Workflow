@@ -49,7 +49,7 @@ public class Program
 
         var apiVersion1 = new ApiVersion(1, 0);
 
-        webApplicationBuilder.Services
+        var services = webApplicationBuilder.Services
             .AddHopper(options =>
             {
                 configuration.GetSection(HopperOptions.SectionName).Bind(options);
@@ -79,31 +79,41 @@ public class Program
                 options.ConnectionString = configuration.GetConnectionString("Workflow") ?? throw new ApplicationException("Missing connection string 'Workflow'.");
             })
             .Services
-            .AddRecall(options =>
-            {
-                configuration.GetSection(RecallOptions.SectionName).Bind(options);
-            })
-            .UseSqlServerEventStorage(options =>
-            {
-                configuration.GetSection(SqlServerStorageOptions.SectionName).Bind(options);
-
-                options.ConnectionString = configuration.GetConnectionString("Workflow") ?? throw new ApplicationException("Missing connection string 'Workflow'.");
-                options.Schema = "workflow";
-            })
-            .RegisterPrimitiveEventSequencing()
-            .UseSqlServerEventProcessing(options =>
-            {
-                configuration.GetSection(SqlServerEventProcessingOptions.SectionName).Bind(options);
-            })
-            .AddProjection<ProcessHandler>(ProjectionNames.Process)
-            .AddProjection<StateHandler>(ProjectionNames.State)
-            .AddProjection<ProcessDefinitionHandler>(ProjectionNames.ProcessDefinition)
-            .Services
             .AddScoped<MessageDispatcher>()
             .AddAccessAuthorization(options =>
             {
                 configuration.GetSection(AccessAuthorizationOptions.SectionName).Bind(options);
-            });
+            })
+            .Services;
+
+        var immediateConsistencyEnabled = configuration.GetValue<bool>($"{RecallOptions.SectionName}:EventProcessing:ImmediateConsistency:Enabled");
+
+        var recallBuilder = services
+            .AddRecall(options =>
+            {
+                configuration.GetSection(RecallOptions.SectionName).Bind(options);
+
+                if (immediateConsistencyEnabled)
+                {
+                    options.EventProcessing.AutoStart = false;
+                }
+            })
+            .UseSqlServerEventStorage(options =>
+            {
+                configuration.GetSection(SqlServerEventProcessingOptions.SectionName).Bind(options);
+
+                options.ConnectionString = configuration.GetConnectionString("Workflow") ?? throw new ApplicationException("Missing connection string 'Workflow'.");
+                options.Schema = "workflow";
+            })
+            .UseSqlServerEventProcessing()
+            .AddProjection<ProcessHandler>(ProjectionNames.Process)
+            .AddProjection<StateHandler>(ProjectionNames.State)
+            .AddProjection<ProcessDefinitionHandler>(ProjectionNames.ProcessDefinition);
+
+        if (immediateConsistencyEnabled)
+        {
+            recallBuilder = recallBuilder.RegisterPrimitiveEventSequencing();
+        }
 
         webApplicationBuilder.Services
             .AddApiVersioning(options =>

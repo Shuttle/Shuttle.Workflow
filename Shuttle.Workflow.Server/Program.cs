@@ -111,16 +111,13 @@ internal class Program
                         });
                     });
 
-                // Correspondence sending is optional: only wire up the Pigeon client when a base address has
-                // actually been configured, so a deployment with nothing to send mail through doesn't need a
-                // dummy configuration value just to start.
                 var pigeonClientOptions = configuration.GetSection(PigeonClientOptions.SectionName).Get<PigeonClientOptions>();
 
                 if (pigeonClientOptions?.BaseAddress != null)
                 {
-                    services.AddPigeonClient(builder =>
+                    services.AddPigeonClient(options =>
                     {
-                        configuration.GetSection(PigeonClientOptions.SectionName).Bind(builder.Options);
+                        configuration.GetSection(PigeonClientOptions.SectionName).Bind(options);
                     });
                 }
             })
