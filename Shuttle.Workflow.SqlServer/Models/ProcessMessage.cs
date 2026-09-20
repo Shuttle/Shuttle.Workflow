@@ -13,6 +13,8 @@ public class ProcessMessage
     public Guid Id { get; set; }
 
     public TimeSpan? InvokeTimeout { get; set; }
+    public int ItemsCompleted { get; set; }
+    public int? ItemsTotal { get; set; }
     public Guid ProcessId { get; set; }
     public int SequenceNumber { get; set; }
 

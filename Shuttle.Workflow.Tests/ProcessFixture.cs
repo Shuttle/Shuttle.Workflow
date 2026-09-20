@@ -209,6 +209,37 @@ public class ProcessFixture
     }
 
     [Test]
+    public void Should_be_able_to_set_the_progress_of_a_message()
+    {
+        var process = Registered();
+        var message = new Process.Message(Guid.NewGuid(), "assemblyA.messageA, assemblyA", 1);
+
+        process.AddMessage(message);
+
+        process.SetMessageProgress(message.Id, 10, 4);
+
+        Assert.That(process.GetMessage(message.Id).ItemsTotal, Is.EqualTo(10));
+        Assert.That(process.GetMessage(message.Id).ItemsCompleted, Is.EqualTo(4));
+
+        process.SetMessageProgress(message.Id, null, 7);
+
+        Assert.That(process.GetMessage(message.Id).ItemsTotal, Is.Null);
+        Assert.That(process.GetMessage(message.Id).ItemsCompleted, Is.EqualTo(7));
+    }
+
+    [Test]
+    public void Should_not_allow_progress_to_report_more_items_completed_than_the_total()
+    {
+        var process = Registered();
+        var message = new Process.Message(Guid.NewGuid(), "assemblyA.messageA, assemblyA", 1);
+
+        process.AddMessage(message);
+
+        Assert.That(() => process.SetMessageProgress(message.Id, 10, 11), Throws.ArgumentException);
+        Assert.That(() => process.SetMessageProgress(message.Id, 10, -1), Throws.ArgumentException);
+    }
+
+    [Test]
     public void Should_not_raise_a_duplicate_commit_for_the_same_key()
     {
         var process = Registered();

@@ -45,6 +45,9 @@ public interface IProcessApi
     [Patch("/v1/processes/{processId}/overdue-at")]
     Task<IApiResponse> SetOverdueAtAsync(Guid processId, OverdueProcess overdueProcess, CancellationToken cancellationToken = default);
 
+    [Patch("/v1/processes/{processId}/messages/{messageId}/progress")]
+    Task<IApiResponse> SetProgressAsync(Guid processId, Guid messageId, ProcessMessageProgress progress, CancellationToken cancellationToken = default);
+
     [Patch("/v1/processes/{processId}/wait")]
     Task<IApiResponse<ProcessContinuation>> WaitAsync(Guid processId, ProcessStatus processStatus, CancellationToken cancellationToken = default);
 }

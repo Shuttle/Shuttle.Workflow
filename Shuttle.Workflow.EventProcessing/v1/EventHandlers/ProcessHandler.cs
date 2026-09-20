@@ -21,6 +21,7 @@ public class ProcessHandler(WorkflowDbContext dbContext, IBus bus) :
     IEventHandler<MessageAdded>,
     IEventHandler<MessageSent>,
     IEventHandler<MessageCompleted>,
+    IEventHandler<MessageProgressSet>,
     IEventHandler<ContinuationSet>,
     IEventHandler<Continued>,
     IEventHandler<Committed>
@@ -149,6 +150,16 @@ public class ProcessHandler(WorkflowDbContext dbContext, IBus bus) :
         process.ContinuationToken = null;
         process.ContinuationMessageId = null;
         process.ContinuationRegisteredAt = null;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task HandleAsync(IEventHandlerContext<MessageProgressSet> context, CancellationToken cancellationToken = default)
+    {
+        var message = await GetProcessMessageAsync(context.Event.MessageId, cancellationToken);
+
+        message.ItemsTotal = context.Event.ItemsTotal;
+        message.ItemsCompleted = context.Event.ItemsCompleted;
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }

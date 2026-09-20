@@ -15,7 +15,7 @@ The messages fall into three groups:
   `HealthCheck` (semaphore cleanup). These carry no payload — the state they act on lives in the process's own
   `State`, addressed by correlation id.
 - **Commands** — one per `Shuttle.Workflow.Application` participant (`RegisterProcess`, `DeferProcess`,
-  `AbandonProcess`, `AddStateItems`, `RegisterProcessDefinition`, and so on). `Shuttle.Workflow.WebApi`
+  `AbandonProcess`, `AddStateItems`, `RegisterProcessDefinition`, `SetProcessMessageProgress`, and so on). `Shuttle.Workflow.WebApi`
   publishes these instead of calling the participant directly whenever immediate consistency isn't configured;
   `Shuttle.Workflow.Server`'s `v1/MessageHandlers` forward each one to the matching `Shuttle.Mediator`
   participant.

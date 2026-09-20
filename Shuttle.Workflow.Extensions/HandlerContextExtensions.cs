@@ -155,5 +155,19 @@ public static class HandlerContextExtensions
                 throw new ApplicationException("Could not set process overdue at.");
             }
         }
+
+        public async Task SetProgressAsync(IWorkflowClient workflowClient, Guid processId, int? itemsTotal, int itemsCompleted, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(workflowClient);
+
+            var messageId = context.GetProcessMessageId();
+            var response = await workflowClient.Processes.SetProgressAsync(processId, messageId, new() { ItemsTotal = itemsTotal, ItemsCompleted = itemsCompleted }, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new ApplicationException($"Could not set progress for message with id '{messageId}'.");
+            }
+        }
     }
 }

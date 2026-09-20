@@ -1,3 +1,4 @@
+using Shuttle.Contract;
 using Shuttle.Workflow.Events.Process.v1;
 
 namespace Shuttle.Workflow;
@@ -77,6 +78,16 @@ public class Process
         GetMessage(id);
 
         return On(new MessageCompleted { MessageId = id, DateCompleted = DateTimeOffset.UtcNow });
+    }
+
+    public MessageProgressSet SetMessageProgress(Guid id, int? itemsTotal, int itemsCompleted)
+    {
+        GetMessage(id);
+
+        Guard.Against<ArgumentException>(itemsCompleted < 0, "'itemsCompleted' may not be less than zero.");
+        Guard.Against<ArgumentException>(itemsTotal.HasValue && itemsCompleted > itemsTotal.Value, "'itemsCompleted' may not be greater than 'itemsTotal'.");
+
+        return On(new MessageProgressSet { MessageId = id, ItemsTotal = itemsTotal, ItemsCompleted = itemsCompleted });
     }
 
     public Continued Continue()
@@ -237,6 +248,13 @@ public class Process
         return messageCompleted;
     }
 
+    private MessageProgressSet On(MessageProgressSet messageProgressSet)
+    {
+        GetMessage(messageProgressSet.MessageId).SetProgress(messageProgressSet.ItemsTotal, messageProgressSet.ItemsCompleted);
+
+        return messageProgressSet;
+    }
+
     private MessageSent On(MessageSent messageSent)
     {
         GetMessage(messageSent.MessageId).Sent(messageSent.DateSent);
@@ -327,6 +345,8 @@ public class Process
         public bool HasCompleted => DateCompleted.HasValue;
         public Guid Id { get; } = id;
         public TimeSpan? InvokeTimeout { get; } = invokeTimeout;
+        public int ItemsCompleted { get; private set; }
+        public int? ItemsTotal { get; private set; }
         public int SequenceNumber { get; } = sequenceNumber;
         public string TypeName { get; } = !string.IsNullOrWhiteSpace(typeName) ? typeName : throw new ArgumentNullException(nameof(typeName));
 
@@ -338,6 +358,12 @@ public class Process
         internal void Sent(DateTimeOffset dateSent)
         {
             DateSent = dateSent;
+        }
+
+        internal void SetProgress(int? itemsTotal, int itemsCompleted)
+        {
+            ItemsTotal = itemsTotal;
+            ItemsCompleted = itemsCompleted;
         }
     }
 

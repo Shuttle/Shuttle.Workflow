@@ -32,6 +32,8 @@ public class Process
         public DateTimeOffset? DateCompleted { get; set; }
         public DateTimeOffset? DateSent { get; set; }
         public Guid Id { get; set; }
+        public int ItemsCompleted { get; set; }
+        public int? ItemsTotal { get; set; }
         public Guid ProcessId { get; set; }
         public int SequenceNumber { get; set; }
         public string TypeName { get; set; } = null!;

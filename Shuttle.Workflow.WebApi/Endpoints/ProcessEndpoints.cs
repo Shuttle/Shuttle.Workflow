@@ -17,6 +17,7 @@ using ContinueProcess = Shuttle.Workflow.Messages.v1.ContinueProcess;
 using DeferProcess = Shuttle.Workflow.WebApi.Contracts.v1.DeferProcess;
 using FailProcess = Shuttle.Workflow.Messages.v1.FailProcess;
 using RegisterProcess = Shuttle.Workflow.WebApi.Contracts.v1.RegisterProcess;
+using SetProcessMessageProgress = Shuttle.Workflow.Messages.v1.SetProcessMessageProgress;
 using SetProcessOverdueAt = Shuttle.Workflow.Messages.v1.SetProcessOverdueAt;
 
 namespace Shuttle.Workflow.WebApi.Endpoints;
@@ -75,7 +76,9 @@ public static class ProcessEndpoints
                 TypeName = item.TypeName,
                 SequenceNumber = item.SequenceNumber,
                 DateSent = item.DateSent,
-                DateCompleted = item.DateCompleted
+                DateCompleted = item.DateCompleted,
+                ItemsTotal = item.ItemsTotal,
+                ItemsCompleted = item.ItemsCompleted
             }).ToList()
         };
     }
@@ -280,6 +283,16 @@ public static class ProcessEndpoints
         await messageDispatcher.DispatchAsync(
             () => new SetProcessOverdueAt { ProcessId = processId, OverdueAt = overdueAt },
             () => new Application.SetProcessOverdueAt(processId, overdueAt),
+            cancellationToken);
+
+        return Results.Accepted();
+    }
+
+    private static async Task<IResult> PatchProgress(MessageDispatcher messageDispatcher, Guid processId, Guid messageId, [FromBody] ProcessMessageProgress model, CancellationToken cancellationToken)
+    {
+        await messageDispatcher.DispatchAsync(
+            () => new SetProcessMessageProgress { ProcessId = processId, MessageId = messageId, ItemsTotal = model.ItemsTotal, ItemsCompleted = model.ItemsCompleted },
+            () => new Application.SetProcessMessageProgress(processId, messageId, model.ItemsTotal, model.ItemsCompleted),
             cancellationToken);
 
         return Results.Accepted();
@@ -605,6 +618,12 @@ public static class ProcessEndpoints
 
             app.MapPatch("/v{version:apiVersion}/processes/{processId:Guid}/message-completed/{messageId:Guid}", PatchMessageCompleted)
                 .RequirePermission(Permissions.Processes.Manage)
+                .WithApiVersionSet(versionSet)
+                .MapToApiVersion(apiVersion1);
+
+            app.MapPatch("/v{version:apiVersion}/processes/{processId:Guid}/messages/{messageId:Guid}/progress", PatchProgress)
+                .RequirePermission(Permissions.Processes.Manage)
+                .WithName("SetProgress")
                 .WithApiVersionSet(versionSet)
                 .MapToApiVersion(apiVersion1);
 
